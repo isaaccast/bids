@@ -1,35 +1,54 @@
 <div ng-controller='dashboard'>
   <h2>Hi {{sessionUser.name}}</h2><a href="#/">Logout</a>
-  <a href="#/add">Add a Question</a>
-  <p>
-    Search:
-  </p>
-  <input type="text" ng-model="search">
-  <table>
-    <thead>
-      <th>
-        Question
-      </th>
-      <th>
-        Answers
-      </th>
-      <th>
-        Action
-      </th>
-    </thead>
-    <tbody>
-      <tr ng-repeat='question in questions | filter:search'>
-        <td>
-          {{question.title}}
-        </td>
-        <td>
-          {{question.num_of_answers}}
-        </td>
-        <td>
-          <a href="#/{{question._id}}">Show</a>
-          <a href="#/answer/{{question._id}}">Answer</a>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <h3>Bid Now!</h3>
+  <div class="product">
+    <h5>Nike Shoes</h5>
+    <img src="imgs/nike shoes.jpg" alt="img" />
+    <input type="number" ng-model="bid1.amount" placeholder="$">
+    <input type="hidden" ng-model="bid1.product" value="1">
+    <button type="button" ng-click="addBid1()" value="">Bid</button>
+    <p ng-repeat="error in errors1 track by $index" ng-bind="error" class='error'></p>
+    <h5>Current Bids</h5>
+    <div class="box">
+      <p ng-repeat="bid in bids1 | filter:search1 | orderBy:'-amount' track by $index">{{bid.user}}: ${{bid.amount}}</p>
+    </div>
+    <p>
+      Search:
+    </p>
+    <input type="text" ng-model="search1">
+  </div>
+  <div class="product">
+    <h5>Candies</h5>
+    <img src="imgs/candies.jpg" alt="img" />
+    <input type="number" ng-model="bid2.amount" placeholder="$">
+    <input type="hidden" ng-model="bid2.product" value="2">
+    <button type="button" ng-click="addBid2()" value="">Bid</button>
+    <p ng-repeat="error in errors2 track by $index" ng-bind="error" class='error'></p>
+    <h5>Current Bids</h5>
+    <div class="box">
+      <p ng-repeat="bid in bids2 | filter:search2 | orderBy:'-amount' track by $index">{{bid.user}}: ${{bid.amount}}</p>
+    </div>
+    <p>
+      Search:
+    </p>
+    <input type="text" ng-model="search2">
+  </div>
+  <div class="product">
+    <h5>Black Belts</h5>
+    <img src="imgs/black belts.jpg" alt="img" />
+    <input type="number" ng-model="bid3.amount" placeholder="$">
+    <input type="hidden" ng-model="bid3.product" value="3">
+    <button type="button" ng-click="addBid3()" value="">Bid</button>
+    <p ng-repeat="error in errors3 track by $index" ng-bind="error" class='error'></p>
+    <h5>Current Bids</h5>
+    <div class="box">
+      <p ng-repeat="bid in bids3 | filter:search3 | orderBy:'-amount' track by $index">{{bid.user}}: ${{bid.amount}}</p>
+    </div>
+    <p>
+      Search:
+    </p>
+    <input type="text" ng-model="search3">
+    <button type="button" ng-click='end()'>End Bid</button>
+  </div>
+
 </div>

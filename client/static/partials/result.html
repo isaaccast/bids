@@ -1,0 +1,23 @@
+<div ng-controller='result' class='result'>
+  <h2>{{sessionUser.name}} ended the Bid</h2><a href="#/">Logout</a>
+  <h4>Highest Bidder per Product</h4>
+  <div class="product">
+    <h5>Nike Shoes</h5>
+    <img src="imgs/nike shoes.jpg" alt="img" />
+    <h5>{{high_bid1.user}}</h5>
+    <h5>${{high_bid1.amount}}</h5>
+  </div>
+  <div class="product">
+    <h5>Candies</h5>
+    <img src="imgs/candies.jpg" alt="img" />
+    <h5>{{high_bid2.user}}</h5>
+    <h5>${{high_bid2.amount}}</h5>
+  </div>
+  <div class="product">
+    <h5>Black Belts</h5>
+    <img src="imgs/black belts.jpg" alt="img" />
+    <h5>{{high_bid3.user}}</h5>
+    <h5>${{high_bid3.amount}}</h5>
+    <button type="button" name="button"><a href="#/dashboard">Start Bid</a></button>
+  </div>
+</div>

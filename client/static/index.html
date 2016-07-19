@@ -2,7 +2,7 @@
 <html ng-app='myApp'>
   <head>
     <meta charset="utf-8">
-    <title>Questions and Answers</title>
+    <title>Auctions Inc.</title>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-route.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-messages.js"></script>
@@ -43,33 +43,37 @@
       span p{
         text-align: center;
       }
-      .showall{
+      .product button{
         text-align: center;
+        display: inline-block;
+      }
+      .box{
+        display: block;;
+        width: 150px;
+        height: 150px;
+        border: 1px solid black;
+        padding: 0px;
+        margin: 0px;
+        overflow-y:auto;
+      }
+      .product input{
+        margin-bottom: 15px;
         display: block;
       }
-      .side_bar{
-        display: inline-block;;
-        width: 169px;
-        height: 600px;
-        margin-top: 40px;
-        text-align: center;
-      }
-      .side_bar input{
-        margin-bottom: 30px;
-      }
-      .all_products{
+      .product{
         display: inline-block;;
         vertical-align: top;
+        margin-right: 40px;
+        width: 155px;
+
       }
       a{
         display: inline-block;
         margin: 5px;
       }
-      .answer input{
-        margin: 10px;
-      }
-      .answer button{
-        margin: 10px;
+      .error{
+        color: red;
+
       }
     </style>
     <script>
@@ -82,80 +86,69 @@
       .when('/dashboard', {
         templateUrl: 'partials/dashboard.html'
       })
-      .when('/add',{
-        templateUrl: 'partials/add.html'
-      })
-      .when('/question', {
-        templateUrl: 'partials/question.html'
-      })
-      .when('/answer', {
-        templateUrl: 'partials/answer.html'
-      })
       .when('/logout', {
         templateUrl: 'partials/index.html'
       })
-      .when('/:id', {
-        templateUrl: 'partials/question.html'
-      })
-      .when('/answer/:id', {
-        templateUrl: 'partials/answer.html'
+      .when('/end', {
+        templateUrl: 'partials/result.html'
       })
       .otherwise({
         redirectTo: '/'
       });
     })
-      app.factory('questionFactory', function($http){
+      app.factory('bidFactory', function($http){
         var factory = {};
-        var questions = [];
-        var question;
-        factory.getQuestions = function(callback){
-          $http.get('/getQuestions').success(function(output){
-            questions = output;
-            callback(questions);
+        var bids = [];
+        factory.getBids1 = function(callback){
+          $http.get('/findBids1').success(function(output){
+            callback(output);
           })
         }
-        factory.getOne = function(id, callback){
-          $http.post('/getOne', id).success(function(response){
+        factory.getBids2 = function(callback){
+          $http.get('/findBids2').success(function(output){
+            callback(output);
+          })
+        }
+        factory.getBids3 = function(callback){
+          $http.get('/findBids3').success(function(output){
+            callback(output);
+          })
+        }
+        factory.high_bid1 = function(callback){
+          $http.get('/findHigh1').success(function(response){
+            console.log(response);
             callback(response);
           })
         }
-        factory.display = function(callback){
-          console.log(question);
-          callback(question);
-        }
-        factory.getAnswers = function(id, callback){
-          $http.post('/getAnswers', id).success(function(data){
-            callback(data);
-          })
-        }
-        factory.addQuestion = function(question, callback){
-          $http.post('/question', question).success(function(){
-            callback();
-          })
-        }
-        return factory;
-      })
-      app.factory('answerFactory', function($http){
-        var factory = {};
-        var answers = [];
-        factory.getAnswers = function(callback){
-          $http.get('/getOrders').success(function(output){
-            orders = output;
-            callback(orders);
-          })
-        }
-        factory.getUser = function(callback){
-          callback(products);
-        }
-        factory.addAnswer = function(answer, question, user, callback){
-          $http.post('/addAnswer',{answer,question,user}).success(function(response){
+        factory.high_bid2 = function(callback){
+          $http.get('/findHigh2').success(function(response){
             callback(response);
           })
         }
-        factory.like = function(answer, callback){
-          console.log(answer, 'made it here');
-          $http.post('/addLike', {answer}).success(function(){
-            callback();
+        factory.high_bid3 = function(callback){
+          $http.get('/findHigh3').success(function(response){
+            callback(response);
+          })
+        }
+        factory.addBid1 = function(bid, callback){
+          console.log('factory');
+          $http.post('/add', bid).success(function(response){
+            callback(response);
+          })
+        }
+        factory.addBid2 = function(bid, callback){
+          $http.post('/add', bid).success(function(response){
+            callback(response);
+          })
+        }
+        factory.addBid3 = function(bid, callback){
+          $http.post('/add', bid).success(function(response){
+            callback(response);
+          })
+        }
+        factory.clearAll = function(callback){
+          $http.get('/clear').success(function(response){
+            callback(response);
           })
         }
         return factory;
@@ -197,94 +190,135 @@
         return factory;
       })
 
-      app.controller('index', function($scope, questionFactory, answerFactory) {
-        $scope.customers = [];
-        customerFactory.getCustomers(function(data){
-          $scope.customers = data;
-        })
-        $scope.addCustomer = function(){
-          customerFactory.newCustomer($scope.customer.name, function(data){
-            $scope.customers = data;
-            console.log($scope.customers);
-            $scope.customer = {};
-          });
-
-          }
-          $scope.removeCustomer = function(customer){
-            customerFactory.removeCustomer(customer, function(data){
-              $scope.customers = data;
-            });
-        }
-      })
-      app.controller('questions', function($scope, answerFactory, questionFactory, userFactory, $route, $routeParams){
+      app.controller('result', function($scope, $location, $window, userFactory, bidFactory) {
         $scope.sessionUser = [];
-        $scope.question = [];
-        $scope.answers = [];
-        console.log($routeParams)
-        userFactory.getSession(function(data){
-          $scope.sessionUser = data;
-        })
-        questionFactory.getOne($routeParams, function(data){
-          $scope.question = data;
-        })
-        questionFactory.getAnswers($routeParams, function(data){
-          $scope.answers = data.answers;
-          console.log($scope.answers);
+        $scope.high_bid1;
+        $scope.high_bid2;
+        $scope.high_bid3;
 
+        bidFactory.high_bid1(function(data){
+          $scope.high_bid1 = data;
+          console.log(high_bid1);
         })
-        $scope.addLike = function(answer){
-          answerFactory.like(answer, function(){
-            $route.reload();
-          });
-        }
-      })
-      app.controller('dashboard', function($scope, answerFactory, questionFactory, userFactory, $location){
-        $scope.questions = [];
-        $scope.one;
-        $scope.sessionUser = [];
-        questionFactory.getQuestions(function(data){
-          $scope.questions = data;
+        bidFactory.high_bid2(function(data){
+          $scope.high_bid2 = data;
         })
-        $scope.showQuestion = function(question){
-
-        }
-        userFactory.getSession(function(data){
-          $scope.sessionUser = data;
+        bidFactory.high_bid3(function(data){
+          $scope.high_bid3 = data;
         })
-      })
-      app.controller('add', function($scope, questionFactory, userFactory, $location){
-        $scope.addQuestion = function(){
-          questionFactory.addQuestion($scope.question, function(){
-            $location.url('/dashboard');
-          })
-        }
-        userFactory.getSession(function(data){
-          $scope.sessionUser = data;
-        })
-
-      })
-      app.controller('answer', function($scope, questionFactory, answerFactory, userFactory, $location, $routeParams){
-        $scope.question;
-        $scope.sessionUser;
-        $scope.errors = [];
-        questionFactory.getOne($routeParams, function(data){
-          $scope.question = data;
-        })
-        userFactory.getSession(function(data){
-          $scope.sessionUser = data;
-        })
-        $scope.addAnswer = function(question, user){
-          answerFactory.addAnswer($scope.answer, question, user, function(response){
-            console.log($scope.sessionUser);
+        bidFactory.clearAll(function(response){
             if(!response.status){
-              $scope.errors.push(response.errors);
+              console.log('didnt clear bids');
             }else{
-            $location.url('/dashboard');
+              console.log('all bids cleared');
             }
           })
+        userFactory.getSession(function(data){
+          $scope.sessionUser = data;
+        })
+      })
+
+      app.controller('dashboard', function($scope, $location, $window, $route, bidFactory, userFactory, $location){
+        $scope.bids1 = [];
+        $scope.bids2 = [];
+        $scope.bids3 = [];
+        high_bid1 ={};
+        high_bid2 ={};
+        high_bid3 ={};
+        $scope.errors1 = [];
+        $scope.errors2 = [];
+        $scope.errors3 = [];
+        $scope.sessionUser = [];
+        userFactory.getSession(function(data){
+          $scope.sessionUser = data;
+
+        })
+        bidFactory.high_bid1(function(data){
+          high_bid1 = data.amount;
+          console.log(high_bid1);
+        })
+        bidFactory.high_bid2(function(data){
+          high_bid2 = data.amount;
+        })
+        bidFactory.high_bid3(function(data){
+          high_bid3 = data.amount;
+        })
+        bidFactory.getBids1(function(data){
+          $scope.bids1 = data;
+          console.log(data);
+        })
+        bidFactory.getBids2(function(data){
+          $scope.bids2 = data;
+        })
+        bidFactory.getBids3(function(data){
+          $scope.bids3 = data;
+        })
+        $scope.end = function(){
+          if(high_bid1 == undefined || high_bid2 == undefined || high_bid3 == undefined){
+            console.log('no bids');
+            $window.alert('Cannot end the bid. One or more products does not have any bid yet.');
+          }else{
+            $location.url('/end');
+          }
+        }
+        $scope.addBid1 = function(){
+          console.log('controller');
+          if($scope.bid1.amount < high_bid1){
+            $scope.errors1.push('Bid amount should be higher than the previous bid.');
+          }else if($scope.bid1.amount <= 0){
+            $scope.errors1.push('Bid amount should be greater than 0');
+          }
+          else{
+            $scope.bid1.product = 1;
+            $scope.bid1.user = $scope.sessionUser.name;
+            bidFactory.addBid1($scope.bid1, function(response){
+              if(!response.status){
+                console.log('bid1 wasnt added!');
+              }else{
+                $route.reload();
+                console.log('bid1 entered!');
+              }
+            })
+          }
+        }
+        $scope.addBid2 = function(){
+          if($scope.bid2.amount < high_bid2){
+            $scope.errors2.push('Bid amount should be higher than the previous bid.');
+          }else if($scope.bid2.amount <= 0){
+            $scope.errors2.push('Bid amount should be greater than 0');
+          }else{
+            $scope.bid2.product = 2;
+            $scope.bid2.user = $scope.sessionUser.name;
+            bidFactory.addBid2($scope.bid2, function(response){
+              if(!response.status){
+                console.log('bid2 wasnt added!');
+              }else{
+                $route.reload();
+                console.log('bid2 entered!');
+              }
+            })
+          }
+        }
+        $scope.addBid3 = function(){
+          if($scope.bid3.amount < high_bid3){
+            $scope.errors3.push('Bid amount should be higher than the previous bid.');
+          }else if($scope.bid3.amount <= 0){
+            $scope.errors3.push('Bid amount should be greater than 0');
+          }else{
+            $scope.bid3.product = 3;
+            $scope.bid3.user = $scope.sessionUser.name;
+            bidFactory.addBid3($scope.bid3, function(response){
+              if(!response.status){
+                console.log('bid3 wasnt added!');
+              }else{
+                $route.reload();
+                console.log('bid3 entered!');
+              }
+            })
+          }
         }
       })
-      app.controller('users', function($scope, userFactory, $location){
+      app.controller('users', function($scope, userFactory, bidFactory, $location){
         $scope.sessionUser = {};
         $scope.errors = [];
         $scope.register = function(){
@@ -303,7 +337,6 @@
     </script>
   </head>
   <body>
-    <h1>Question and Answer</h1>
     <div ng-view="">
 
     </div>
